@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trading Journal</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+    }
+    button {
+      background: #22c55e;
+      border: none;
+      color: white;
+    }
+    .card {
+      background: #1e293b;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📊 Trading Journal</h1>
+
+<h2>Add Trade</h2>
+
+<input id="symbol" placeholder="Symbol">
+<select id="type">
+  <option>BUY</option>
+  <option>SELL</option>
+</select>
+<input id="entry" placeholder="Entry">
+<input id="exit" placeholder="Exit">
+<input id="lot" placeholder="Lot Size">
+
+<button onclick="addTrade()">Add Trade</button>
+
+<h2>Trades</h2>
+<div id="trades"></div>
+
+<script>
+async function addTrade() {
+  const trade = {
+    symbol: document.getElementById('symbol').value,
+    type: document.getElementById('type').value,
+    entry: parseFloat(document.getElementById('entry').value),
+    exit: parseFloat(document.getElementById('exit').value),
+    lot: parseFloat(document.getElementById('lot').value)
+  };
+
+  await fetch('/api/trades', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(trade)
+  });
+
+  loadTrades();
+}
+
+async function loadTrades() {
+  const res = await fetch('/api/trades');
+  const data = await res.json();
+
+  const div = document.getElementById('trades');
+  div.innerHTML = "";
+
+  data.forEach(t => {
+    div.innerHTML += `
+      <div class="card">
+        ${t.symbol} | ${t.type} | Entry: ${t.entry} | Exit: ${t.exit} | Profit: ${t.profit}
+      </div>
+    `;
+  });
+}
+
+loadTrades();
+</script>
+
+</body>
+</html>
